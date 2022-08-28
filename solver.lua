@@ -146,42 +146,42 @@ function solve()
 			return solved, tries
 		elseif solved == false and count == max_round then printf("\asolved -> false\n") os.exit()
 		else
-		-- remove from S any code that would not give the same pattern
-		for k, v in pairs(S) do
-			local S_code_pattern = pegs_pattern(dissect_code(k), dissect_code(current_guess))
-			if S_code_pattern ~= current_pattern then S[k] = nil end end
-		-- score each guess
-		for k, v in pairs(codes) do
-			local test_guess = k
-      			local test_table = {}
+			-- remove from S any code that would not give the same pattern
 			for k, v in pairs(S) do
-				local s_pattern = pegs_pattern(dissect_code(k), dissect_code(test_guess))
-        			test_table[s_pattern] = (test_table[s_pattern] or 0) + 1
+				local S_code_pattern = pegs_pattern(dissect_code(k), dissect_code(current_guess))
+				if S_code_pattern ~= current_pattern then S[k] = nil end end
+			-- score each guess
+			for k, v in pairs(codes) do
+				local test_guess = k
+      				local test_table = {}
+				for k, v in pairs(S) do
+					local s_pattern = pegs_pattern(dissect_code(k), dissect_code(test_guess))
+        				test_table[s_pattern] = (test_table[s_pattern] or 0) + 1
+				end
+      				local index_test = {}
+      				for k in pairs(test_table) do index_test[#index_test+1] = k end 
+      				table.sort(index_test, function (c1, c2)
+          			return test_table[c1] > test_table[c2] or
+          			test_table[c1] == test_table[c2] and c1 > c2 end)
+      				score[test_guess] = test_table[index_test[1]]
 			end
-      		local index_test = {}
-      		for k in pairs(test_table) do index_test[#index_test+1] = k end 
-      		table.sort(index_test, function (c1, c2)
-          	return test_table[c1] > test_table[c2] or
-          	test_table[c1] == test_table[c2] and c1 > c2 end)
-      		score[test_guess] = test_table[index_test[1]]
 		end
-	end
-  	local score_list = {}
-  	for k in pairs(score) do
-    		score_list[#score_list + 1] = k
-  	end
-	table.sort(score_list, function (c1, c2)
-      	return score[c1] < score[c2] or
-      	score[c1] == score[c2] and c1 < c2
-    	end)
-  	__TEST_TABLE = {}
-  	for k, v in pairs(S) do if score[score_list[1]] == score[k] then __TEST_TABLE[#__TEST_TABLE+1] = k end end
-  	table.sort(__TEST_TABLE)
-  	current_guess = __TEST_TABLE[1] or score_list[1]
-  	solved, tries, current_pattern = guess(current_guess)
- 	 -- score regen
-  	for i=peg_number, peg_number*6 do if string.match(i, "07-9]") then goto test
-    		score[i] = 0 ::test:: end end
+  		local score_list = {}
+  		for k in pairs(score) do
+    			score_list[#score_list + 1] = k
+  		end
+		table.sort(score_list, function (c1, c2)
+      		return score[c1] < score[c2] or
+      		score[c1] == score[c2] and c1 < c2
+    		end)
+  		__TEST_TABLE = {}
+  		for k, v in pairs(S) do if score[score_list[1]] == score[k] then __TEST_TABLE[#__TEST_TABLE+1] = k end end
+  		table.sort(__TEST_TABLE)
+  		current_guess = __TEST_TABLE[1] or score_list[1]
+  		solved, tries, current_pattern = guess(current_guess)
+ 	 	-- score regen
+  		for i=peg_number, peg_number*6 do if string.match(i, "07-9]") then goto test
+    			score[i] = 0 ::test:: end end
 	end 	 -- end solving loop
 end        	 -- end solve()
 local solved, tries = solve()
