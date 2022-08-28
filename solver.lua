@@ -67,8 +67,6 @@ function first_gen()
 	return table.concat(number_table)
 end
 
-function sleep(n) os.execute("sleep " .. tonumber(n)) end
-
 local function dissect_code(code)
 	t = {}
 	for digit in string.gmatch(code, "%d") do
