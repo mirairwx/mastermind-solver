@@ -45,7 +45,6 @@ max_round = number_rounds+1
 __PEGS_TABLE = {}
 for i=1, number_pegs do __PEGS_TABLE[#__PEGS_TABLE+1] = 1 end
 peg_number = table.concat(__PEGS_TABLE)
--- for k, v in ipairs(__PEGS_TABLE) do print(__PEGS_TABLE[k]) end
 
 for i=peg_number, peg_number*6 do
 	if string.match(i, "[07-9]") then goto continue end
