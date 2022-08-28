@@ -1,16 +1,53 @@
 #!/usr/bin/env luajit
 
-function printf (fmt, ...)
-	return io.write(string.format(fmt, ...))
-end
+function printf(fmt, ...) io.write(string.format(fmt, ...)) end
 
-math.randomseed(os.time()*5)
+math.randomseed(os.time()^5*os.clock())
+
+local getopt = require"posix.unistd".getopt
+
+local fopt={
+	["h"] = function (optarg,optind)
+		io.stderr:write(
+			string.format(
+				"Mastermind minimax solver (CC) 2022 Eduardo Rhenius\n"
+				.."Usage: %s [OPTION]...\n\n"
+				.."  -h  display this help\n"
+				.."  -p  pegs (4)\n"
+				.."  -t  turns (5)\n\n",
+				arg[0]
+				)
+			)
+			os.exit(1)
+		end,
+	["p"] = function (optarg,optind)
+		number_pegs = tonumber(optarg)
+		end,
+	
+	["t"] = function (optarg,optind)
+		number_rounds = tonumber(optarg)
+		end,
+	}
+
+for r, optarg, optind in getopt(arg, "p:t:h") do
+	last_index = optind
+	if fopt[r](optarg, optind) then break end
+end
 
 codes = {}
 codeset = {}
 S = {}
 score = {}
-for i=1111, 6666 do
+
+number_pegs = number_pegs or 4
+number_rounds = number_rounds or 5
+max_round = number_rounds+1
+__PEGS_TABLE = {}
+for i=1, number_pegs do __PEGS_TABLE[#__PEGS_TABLE+1] = 1 end
+peg_number = table.concat(__PEGS_TABLE)
+-- for k, v in ipairs(__PEGS_TABLE) do print(__PEGS_TABLE[k]) end
+
+for i=peg_number, peg_number*6 do
 	if string.match(i, "[07-9]") then goto continue end
 	codes[i] = true
 	S[i] = true
@@ -20,6 +57,15 @@ for i=1111, 6666 do
 end
 
 psymbol = {"r", "w", "."}
+
+function first_gen()
+	local second = (math.floor(number_pegs/2))
+	local first = second + (number_pegs % 2)
+	local number_table = {}
+	for i=1, first do number_table[#number_table+1] = 1 end
+	for i=1, second do number_table[#number_table+1] = 2 end
+	return table.concat(number_table)
+end
 
 function sleep(n) os.execute("sleep " .. tonumber(n)) end
 
@@ -32,7 +78,7 @@ local function dissect_code(code)
 end
 
 -- test
-local test = codes[6666]
+local test = codes[peg_number*6]
 local test2 = codeset[7]
 printf("code gen %s   codeset loop %d\n", test, test2)
 
@@ -54,16 +100,16 @@ local function pegs_pattern(code_dsd, decode_table)
 	local pattern = {}
 	local cd = codes_copy(cd, code_dsd)
 	local dt = codes_copy(dt, decode_table)
-	for i=1,4 do 
+	for i=1,number_pegs do 
 		pattern[i] = psymbol[3] end
-	for i=1,4 do
+	for i=1,number_pegs do
 		if cd[i] == dt[i] then
 			pattern[i] = psymbol[1]
 			cd[i], dt[i] = nil, nil
 		end
 	end
-	for i=1,4 do
-		for j=1,4 do
+	for i=1,number_pegs do
+		for j=1,number_pegs do
 			if cd[i] == dt[j] and pattern[i] ~= psymbol[1] then
 				pattern[i] = psymbol[2]
 				cd[i], dt[j] = nil, nil
@@ -88,17 +134,17 @@ end
 function guess(code)
 	count = count or 1
 	local code_dsd = dissect_code(code)
-	local decode_table = dissect_code(code_crack)
-	
+	local decode_table = dissect_code(code_crack)	
 	local pattern = pegs_pattern(code_dsd, decode_table)
+	
 	table.sort(pattern)
 	pattern = string.gsub(table.concat(pattern), "[.]", "")
 	bullets = pattern; bullets = string.gsub(bullets, "r", "●"); bullets = string.gsub(bullets, "w", "○")
 	printf("turn %d -> %d   %s\n", count, code, bullets)
 	
-	if pattern == "rrrr" and count ~= 6 then
+	if pattern == string.rep("r", number_pegs) and count ~= max_round then
 		return true, count, pattern
-	elseif count >= 6 then
+	elseif count >= max_round then
 		return false, count, pattern
 	else
 		count = count + 1
@@ -107,14 +153,15 @@ function guess(code)
 end
 
 function solve()
-	solved, tries, current_pattern = guess(1122)
-	current_guess = 1122
+	first_guess = first_gen()
+	solved, tries, current_pattern = guess(first_guess)
+	current_guess = first_guess
 	-- solving loop
-	for i=1,5 do
+	for i=1,number_rounds do
 		-- check for win
 		if solved == true then
 			return solved, tries
-		elseif solved == false and count == 6 then while true do printf("\asolved -> false\n") sleep(1) end
+		elseif solved == false and count == max_round then printf("\asolved -> false\n") os.exit()
 		else
 		-- remove from S any code that would not give the same pattern
 		for k, v in pairs(S) do
@@ -153,7 +200,7 @@ function solve()
   	current_guess = __TEST_TABLE[1] or score_list[1]
   	solved, tries, current_pattern = guess(current_guess)
  	 -- score regen
-  	for i=1111, 6666 do if string.match(i, "07-9]") then goto test
+  	for i=peg_number, peg_number*6 do if string.match(i, "07-9]") then goto test
     		score[i] = 0 ::test:: end end
 	end 	 -- end solving loop
 end        	 -- end solve()
