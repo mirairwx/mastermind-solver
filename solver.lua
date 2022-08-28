@@ -117,22 +117,9 @@ local function pegs_pattern(code_dsd, decode_table)
 	return pattern
 end
 
-function cmp_pattern(p1, p2)
-  local c1, c2 = p1, p2
-  local c1_red_hits, c1_white_hits = 0, 0
-  local c2_red_hits, c2_white_hits = 0, 0
-  for r in string.gmatch(c1, "r") do c1_red_hits = c1_red_hits + 1 end
-  for w in string.gmatch(c1, "w") do c1_white_hits = c1_white_hits + 1 end
-  for r in string.gmatch(c2, "r") do c2_red_hits = c2_red_hits + 1 end
-  for w in string.gmatch(c2, "w") do c2_white_hits = c2_white_hits + 1 end
-  if (c1_red_hits == c2_red_hits) and (c1_white_hits == c2_white_hits) then return true else return false end
-end
-
 function guess(code)
 	count = count or 1
-	local code_dsd = dissect_code(code)
-	local decode_table = dissect_code(code_crack)	
-	local pattern = pegs_pattern(code_dsd, decode_table)
+	local pattern = pegs_pattern(dissect_code(code), dissect_code(code_crack))
 	
 	table.sort(pattern)
 	pattern = string.gsub(table.concat(pattern), "[.]", "")
@@ -163,8 +150,9 @@ function solve()
 		-- remove from S any code that would not give the same pattern
 		for k, v in pairs(S) do
 			local S_code_pattern = pegs_pattern(dissect_code(k), dissect_code(current_guess))
+			table.sort(S_code_pattern)
    			S_code_pattern = string.gsub(table.concat(S_code_pattern), "[.]", "")
-      			if cmp_pattern(S_code_pattern, current_pattern) == false then S[k] = nil end end
+			if S_code_pattern ~= current_pattern then S[k] = nil end end
 		-- score each guess
 		for k, v in pairs(codes) do
 			local test_guess = k
