@@ -10,7 +10,7 @@ local fopt={
 	["h"] = function (optarg,optind)
 		io.stderr:write(
 			string.format(
-				"Mastermind minimax solver (CC) 2022 Eduardo Rhenius\n"
+				"Mastermind minimax solver ©2022 Eduardo Rhenius\n"
 				.."Usage: %s [OPTION]...\n\n"
 				.."  -h  display this help\n"
 				.."  -p  pegs (4)\n"
