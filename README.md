@@ -1,3 +1,2 @@
 # Mastermind solver
-Solves the game "Mastermind" implementing Knuth's algorithm:     
-https://en.wikipedia.org/wiki/Mastermind_(board_game)#Worst_case:_Five-guess_algorithm
+Implementation of **minimax algorithm** described in this [paper](http://www.cs.uni.edu/~wallingf/teaching/cs3530/resources/knuth-mastermind.pdf).
