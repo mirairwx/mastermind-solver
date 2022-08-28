@@ -114,7 +114,6 @@ local function pegs_pattern(code_dsd, decode_table)
 			end
 		end
 	end
-     -- pattern = string.gsub(table.concat(pattern), "[.]", "")
 	return pattern
 end
 
