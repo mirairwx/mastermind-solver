@@ -42,6 +42,7 @@ score = {}
 number_pegs = number_pegs or 4
 number_rounds = number_rounds or 5
 max_round = number_rounds+1
+
 __PEGS_TABLE = {}
 for i=1, number_pegs do __PEGS_TABLE[#__PEGS_TABLE+1] = 1 end
 peg_number = table.concat(__PEGS_TABLE)
