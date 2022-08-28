@@ -1,6 +1,6 @@
 #!/usr/bin/env luajit
 
-function printf(fmt, ...) io.write(string.format(fmt, ...)) end
+local function printf(fmt, ...) io.write(string.format(fmt, ...)) end
 
 math.randomseed(os.time()^5*os.clock())
 
