@@ -81,7 +81,6 @@ local test2 = codeset[7]
 printf("code gen %s   codeset loop %d\n", test, test2)
 
 local code_crack = codeset[math.random(#codeset)]
--- code_crack = 1122
 -- code_crack = 3632
 
 printf("decode -> %s\n", code_crack)
@@ -114,6 +113,8 @@ local function pegs_pattern(code_dsd, decode_table)
 			end
 		end
 	end
+	table.sort(pattern)
+	pattern = string.gsub(table.concat(pattern), "[.]", "")
 	return pattern
 end
 
@@ -121,8 +122,6 @@ function guess(code)
 	count = count or 1
 	local pattern = pegs_pattern(dissect_code(code), dissect_code(code_crack))
 	
-	table.sort(pattern)
-	pattern = string.gsub(table.concat(pattern), "[.]", "")
 	bullets = pattern; bullets = string.gsub(bullets, "r", "●"); bullets = string.gsub(bullets, "w", "○")
 	printf("turn %d -> %d   %s\n", count, code, bullets)
 	
@@ -150,8 +149,6 @@ function solve()
 		-- remove from S any code that would not give the same pattern
 		for k, v in pairs(S) do
 			local S_code_pattern = pegs_pattern(dissect_code(k), dissect_code(current_guess))
-			table.sort(S_code_pattern)
-   			S_code_pattern = string.gsub(table.concat(S_code_pattern), "[.]", "")
 			if S_code_pattern ~= current_pattern then S[k] = nil end end
 		-- score each guess
 		for k, v in pairs(codes) do
@@ -159,8 +156,6 @@ function solve()
       			local test_table = {}
 			for k, v in pairs(S) do
 				local s_pattern = pegs_pattern(dissect_code(k), dissect_code(test_guess))
-        			table.sort(s_pattern)
-        			s_pattern = string.gsub(table.concat(s_pattern), "[.]", "")
         			test_table[s_pattern] = (test_table[s_pattern] or 0) + 1
 			end
       		local index_test = {}
